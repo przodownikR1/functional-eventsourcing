@@ -1,4 +1,4 @@
-# Functional event sourcing, implementation with javaslang.
+#Games woth Functional event sourcing
 
 Simple aggregate created with the help of:
 
