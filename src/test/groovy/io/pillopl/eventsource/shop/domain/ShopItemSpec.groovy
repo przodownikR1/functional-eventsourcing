@@ -6,7 +6,7 @@ import io.pillopl.eventsource.shop.domain.commands.Pay
 import io.pillopl.eventsource.shop.domain.events.ItemPaid
 import io.pillopl.eventsource.shop.domain.events.ItemOrdered
 import io.pillopl.eventsource.shop.domain.events.ItemPaymentTimeout
-import javaslang.control.Try
+import io.vavr.control.Try
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -40,7 +40,7 @@ class ShopItemSpec extends Specification {
         given:
             ShopItem initialized = initialized()
         when:
-            Try<ShopItem> tryOrder = initialized.order(new OrderWithTimeout(uuid, ANY_PRICE, parse(orderingAt), expiresInMinutes))
+        Try<ShopItem> tryOrder = initialized.order(new OrderWithTimeout(uuid, ANY_PRICE, parse(orderingAt), expiresInMinutes))
         then:
             tryOrder.isSuccess()
             ((ItemOrdered) tryOrder.get().getUncommittedChanges().head()).paymentTimeoutDate == parse(deadline)

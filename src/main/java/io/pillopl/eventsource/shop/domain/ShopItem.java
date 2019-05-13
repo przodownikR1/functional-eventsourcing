@@ -8,28 +8,31 @@ import io.pillopl.eventsource.shop.domain.events.DomainEvent;
 import io.pillopl.eventsource.shop.domain.events.ItemOrdered;
 import io.pillopl.eventsource.shop.domain.events.ItemPaid;
 import io.pillopl.eventsource.shop.domain.events.ItemPaymentTimeout;
-import javaslang.API;
-import javaslang.Function1;
-import javaslang.Function2;
-import javaslang.control.Try;
+
+import io.vavr.API;
+import io.vavr.Function1;
+import io.vavr.Function2;
+import io.vavr.Predicates;
+
+import io.vavr.collection.List;
+import io.vavr.control.Try;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Wither;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.UUID;
 
-
-import static io.pillopl.eventsource.shop.domain.ShopItemStatus.INITIALIZED;
-import static io.pillopl.eventsource.shop.domain.ShopItemStatus.ORDERED;
-import static io.pillopl.eventsource.shop.domain.ShopItemStatus.PAID;
-import static io.pillopl.eventsource.shop.domain.ShopItemStatus.PAYMENT_MISSING;
-import static javaslang.API.Case;
-import static javaslang.Predicates.instanceOf;
-import static javaslang.collection.List.ofAll;
-import static javaslang.control.Try.*;
+import static io.pillopl.eventsource.shop.domain.ShopItemStatus.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static io.vavr.API.run;
+import static io.vavr.Predicates.allOf;
+import static io.vavr.Predicates.anyOf;
+import static io.vavr.Predicates.instanceOf;
+import static io.vavr.control.Try.*;
 
 @RequiredArgsConstructor
 @Getter
@@ -152,9 +155,9 @@ public class ShopItem {
     /**
      * Rebuilding aggregate with left fold and pattern match
      */
-    public static ShopItem rebuild(UUID uuid, List<DomainEvent> history) {
-        return ofAll(history)
-                .foldLeft(
+    public static ShopItem rebuild(UUID uuid, java.util.List<DomainEvent> history) {
+        return io.vavr.collection.List.ofAll(history)
+                   .foldLeft(
                         initialState(uuid),
                         ShopItem::patternMatch);
 
@@ -167,9 +170,10 @@ public class ShopItem {
 
     private ShopItem patternMatch(DomainEvent event) {
         return API.Match(event).of(
-                Case(instanceOf(ItemPaid.class), this::paid),
-                Case(instanceOf(ItemOrdered.class), this::ordered),
-                Case(instanceOf(ItemPaymentTimeout.class), this::paymentMissed)
+
+                Case($(instanceOf(ItemPaid.class)), this::paid),
+                Case($(instanceOf(ItemOrdered.class)), this::ordered),
+                Case($(instanceOf(ItemPaymentTimeout.class)), this::paymentMissed)
         );
     }
 

@@ -13,3 +13,8 @@ logs
 .zip
 /out
 *~
+/functional-eventsourcing.iml
+/functional-eventsourcing.ipr
+/functional-eventsourcing.main.iml
+/functional-eventsourcing.test.iml
+/functional-eventsourcing.iws

@@ -1,7 +1,7 @@
 
 buildscript {
     ext {
-        springBootVersion = '1.4.0.RELEASE'
+        springBootVersion = '2.1.0.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -14,15 +14,21 @@ buildscript {
     }
 
 }
-
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Camden.RELEASE'
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Greenwich.RELEASE'
     }
 }
 
@@ -32,37 +38,36 @@ jar {
 }
 
 repositories {
-    mavenLocal()
-    jcenter()
+    mavenCentral()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 dependencies {
-    compile 'org.springframework.cloud:spring-cloud-stream'
-    compile('org.springframework.cloud:spring-cloud-starter-stream-kafka')
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile "org.projectlombok:lombok:$lombokVersion"
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.2'
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.2"
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.2'
-    compile "org.liquibase:liquibase-core:$liquibaseVersion"
-    compile 'com.google.guava:guava:18.0'
-    compile "io.javaslang:javaslang:2.0.5"
+    implementation 'org.springframework.cloud:spring-cloud-stream'
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.8"
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.8'
+    implementation 'org.liquibase:liquibase-core'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    implementation group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.0'
+    implementation group: 'io.vavr', name: 'vavr-match', version: '0.10.0'
 
-    runtime 'cglib:cglib-nodep:3.2.1'
-    runtime 'com.h2database:h2'
+    testCompile 'org.springframework.cloud:spring-cloud-stream-test-support-internal:2.1.0.RELEASE'
 
-    testCompile 'org.springframework.cloud:spring-cloud-stream-test-support-internal:1.1.0.RELEASE'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.spockframework:spock-core:1.1-groovy-2.4"
+    testImplementation "org.spockframework:spock-spring:1.1-groovy-2.4"
+    testImplementation( "com.athaydes:spock-reports:1.4.0" ) { transitive = false // this avoids affecting your version of Groovy/Spock
+    }
+    testImplementation "net.bytebuddy:byte-buddy:1.8.12"
+    testImplementation "org.objenesis:objenesis:2.6"
+    testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
 
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
-    testCompile 'org.spockframework:spock-spring'
-    testCompile 'org.springframework.cloud:spring-cloud-stream-test-support'
-
-}
-
-wrapper {
-    gradleVersion '2.12'
 }
 
